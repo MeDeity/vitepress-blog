@@ -1,5 +1,3 @@
-import { defineConfig } from 'vitepress'
-
 const baseUrl = "/vitepress-blog/"
 
 export default {
