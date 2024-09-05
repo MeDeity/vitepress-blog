@@ -2,7 +2,10 @@ import { defineConfig } from "vitepress";
 import { fileURLToPath, URL } from "node:url";
 import { getSidebar } from "./utils/getSidebar";
 
+const baseUrl = "/";
+
 export default defineConfig({
+  base: baseUrl,
   // 标签上显示的网站标题
   title: "Easy VitePress Blog",
   titleTemplate: "Blog",
