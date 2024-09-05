@@ -23,7 +23,7 @@ interface SideBar {
  * @param {string} prefix - 不包含根目录的前缀路由
  */
 function generate(notesRootPath: string, pagePath: string, prefix = "", depth = 0) {
-  if (depth >= 4) return [];
+  if (depth >= 10) return [];
 
   // 构造绝对路径，用于读取目录下的所有文件信息
   const dir = path.join(process.cwd(), notesRootPath, prefix, pagePath);

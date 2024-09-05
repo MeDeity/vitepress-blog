@@ -2,7 +2,7 @@ import { defineConfig } from "vitepress";
 import { fileURLToPath, URL } from "node:url";
 import { getSidebar } from "./utils/getSidebar";
 
-const baseUrl = "/vitepress-blog";
+const baseUrl = "/vitepress-blog/";
 
 export default defineConfig({
   base: baseUrl,
