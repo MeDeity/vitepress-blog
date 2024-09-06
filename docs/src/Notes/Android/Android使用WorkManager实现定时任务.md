@@ -11,7 +11,7 @@ WorkManager是Google在Android Jetpack中提供的一个组件,用于在应用�
 WorkManager支持多种任务类型,如一次性任务、周期性任务等.WorkManager会根据任务的优先级和约束条件,自动选择合适的执行时机来运行任务.
 WorkManager 适合以下几种场景:
 
-![持久性工作的类型-来自Google官网](./image.png)
+![持久性工作的类型-来自Google官网](images/2024/09/05/image.png)
 
 ### 适用场景
 在使用之前,我们需要了解我们的需求是否真的需要使用WorkManager.
