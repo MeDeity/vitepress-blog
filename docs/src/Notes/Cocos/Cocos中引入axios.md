@@ -14,7 +14,7 @@ npm install --save-dev axios@0.19
 然后将`axios.js`、`index.d.ts`、`axios.map` 单独拷贝处理使用
 以下是我对axios的抽离 [single-axios](images/2024/09/06/single-axios.zip),可以直接下载使用
 我新建了个request.ts,对`axios`的实例进行了封装,并在api.ts中使用了封装后的`axios`
-![Alt text](images/2024/09/06/image.png)
+![Alt text](images/2024/09/06/image_struct.png)
 
 以下是`api.ts`的接口示例
 ```typescript
