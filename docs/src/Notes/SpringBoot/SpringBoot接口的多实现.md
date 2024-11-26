@@ -93,5 +93,73 @@ public interface MsTtsServiceImpl implements TtsService {
 ```
 以上,我们添加了`@ConditionalOnProperty(value="tts.type",havingValue = "ms")`当`tts.type=ms`时,才会注入这个实现类,这样就可以实现通过修改yml配置动态切换实现类了
 
+### 使用数据库配置实现接口服务的多实现
+使用以上方式终究需要通过硬编码来实现动态切换,使用数据库配置来实现接口服务的动态切换可以避免硬编码
+```java
+// 定义策略接口
+public interface ServiceStrategy {
+    void process();
+}
+
+// 实现类1
+@Service
+public class PrimaryServiceStrategy implements ServiceStrategy {
+    @Override
+    public void process() {
+        // 实现逻辑
+    }
+}
+
+// 实现类2
+@Service
+public class SecondaryServiceStrategy implements ServiceStrategy {
+    @Override
+    public void process() {
+        // 实现逻辑
+    }
+}
+
+// 策略工厂
+@Service
+public class ServiceStrategyFactory {
+    private final Map<String, ServiceStrategy> strategies = new HashMap<>();
+
+    // 构造函数注入所有ServiceStrategy实现
+    // Spring框架会自动注入所有被@Service或@Component注解标记的实现ServiceStrategy接口的Bean
+    @Autowired
+    public ServiceStrategyFactory(List<ServiceStrategy> strategyList) {
+        for (ServiceStrategy strategy : strategyList) {
+            // 假设类名以"Strategy"结尾，移除后作为key
+            strategies.put(strategy.getClass().getSimpleName().replace("Strategy", ""), strategy);
+        }
+    }
+
+    // 根据类型获取策略
+    public ServiceStrategy getStrategy(String type) {
+        return strategies.getOrDefault(type, strategies.get("primary"));
+    }
+}
+
+
+// 使用示例
+@Service
+public class SomeBusinessService {
+    @Autowired
+    private ServiceStrategyFactory strategyFactory;
+
+    @Autowired
+    private UserOptionsRepository userOptionsRepository;
+
+    public void performBusinessAction(Long userId) {
+        Optional<UserOptions> userOptions = userOptionsRepository.findByUserId(userId);
+        String serviceType = userOptions.map(UserOptions::getServiceType).orElse("primary");
+        ServiceStrategy strategy = strategyFactory.getStrategy(serviceType);
+        strategy.performAction();
+    }
+}
+
+```
+
+
 ### 参考链接
 1. [spring接口多实现类，选择性注入的4种解决方案](https://juejin.cn/post/7134940044179013668)
