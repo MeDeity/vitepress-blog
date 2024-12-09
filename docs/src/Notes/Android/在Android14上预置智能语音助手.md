@@ -2,7 +2,7 @@
 title: "在Android14上预置智能语音助手"
 outline: deep
 desc: "在Android14上预置智能语音助手笔记"
-tags: "Android,权限,语音助手"
+tags: "Android,权限,语音助手,展锐"
 updateTime: "2024-11-01 10:00"
 ---
 ### 简介
@@ -101,7 +101,11 @@ sys\packages\apps\Settings\src\com\android\settings\password\ChooseLockGeneric.j
 默认不锁屏
 sys\frameworks\base\packages\SettingsProvider\res\values\defaults.xml
 ```xml
-<!--{@ modify by fwenhua @20241031-->
+<!--{@ modify @20241031 设置设备默认不锁屏-->
 <bool name="def_lockscreen_disabled">true</bool>
 <!--@}-->
 ```
+
+> 以下内容可能不通用仅当记录用
+
+做好以上的配置后,在`vnd`目录下执行`source zlunch.sh && source zmk`
