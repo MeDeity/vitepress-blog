@@ -9,7 +9,8 @@ updateTime: "2024-12-12"
 ### 界面开发选型
 一般使用PyQt开发界面,通常会配合 Qt Designer 进行界面设计,
 
-由于我这边配合`VsCode`进行开发,推荐安装`PYQT Integration`插件,安装后需要做相应的配置,需要告知`PYQT Integration` Qt Designer所在的地址  
+
+如果是PyQt5,由于我这边配合`VsCode`进行开发,推荐安装`PYQT Integration`插件,安装后需要做相应的配置,需要告知`PYQT Integration` Qt Designer所在的地址  
 ```bash
 # 获取Qt Designer安装路径
 pip show qt5_applications
@@ -23,3 +24,5 @@ pip show qt5_applications
 designer
 ```
 命令可以启动界面设计器
+
+> PyQt5 目前发现版本有问题 `pip install pyqt5==5.15.4` 发现会报`ModuleNotFoundError: No module named 'PyQt5.sip'`
