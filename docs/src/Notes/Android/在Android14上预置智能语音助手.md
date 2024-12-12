@@ -98,7 +98,7 @@ include $(BUILD_PREBUILT)
 sys\packages\apps\Settings\src\com\android\settings\password\ChooseLockGeneric.java
 
 
-默认不锁屏
+### 默认不锁屏
 sys\frameworks\base\packages\SettingsProvider\res\values\defaults.xml
 ```xml
 <!--{@ modify @20241031 设置设备默认不锁屏-->
