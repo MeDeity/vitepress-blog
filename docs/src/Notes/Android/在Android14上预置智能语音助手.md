@@ -106,6 +106,12 @@ sys\frameworks\base\packages\SettingsProvider\res\values\defaults.xml
 <!--@}-->
 ```
 
+### 在Config.mk中添加预置应用
+```mk
+#---内置APP配置区 device.mk 添加--------------------------------------------
+PRODUCT_PACKAGES=JxAi Moonchat
+```
+
 > 以下内容可能不通用仅当记录用
 
 做好以上的配置后,在`vnd`目录下执行`source zlunch.sh && source zmk`
