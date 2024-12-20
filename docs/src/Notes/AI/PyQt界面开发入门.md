@@ -123,6 +123,46 @@ exe = EXE(
 pyinstaller --windowed --icon=logo.ico main.py
 
 ```
+或者直接修改spec文件
+```python
+exe = EXE(
+    pyz,
+    a.scripts,
+    [],
+    exclude_binaries=True,
+    name='main',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    console=False,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    icon=['logo.ico'],
+)
+```
+增加`icon=['logo.ico']`即可
+
+### 替换应用图标
+在`main.py`同级目录下创建一个`logo.ico`图标文件,然后使用以下命令打包
+```python
+from PyQt6.QtGui import QIcon
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon('./logo.ico'))
+    
+    # 创建主窗口(示例)
+    MainWindow = LoginWindow()
+    MainWindow.show()
+
+    sys.exit(app.exec())
+```
+
+
 
 
 
