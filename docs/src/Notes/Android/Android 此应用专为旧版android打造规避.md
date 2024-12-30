@@ -39,5 +39,5 @@ public static final int MIN_SUPPORTED_TARGET_SDK_INT = SystemProperties.getInt(
 adb shell getprop ro.build.version.min_supported_target_sdk
 # 例如返回 28,表示只要APK的targetSdkVersion低于28,就会弹出提示
 ```
-如果可以修改APK,那么把targetSdkVersion改为返回值以上即可
+如果可以修改APK,那么把targetSdkVersion改为返回值以上即可,记得同时做好权限适配
 
