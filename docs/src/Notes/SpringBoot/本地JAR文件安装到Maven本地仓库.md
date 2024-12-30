@@ -13,17 +13,18 @@ updateTime: "2024-12-30"
 
 ```bash
 # 依次是本地jar文件的路径,groupId,artifactId和version等信息
-mvn install:install-file -Dfile=path/to/your/local-jar.jar -DgroupId=com.example -DartifactId=local-jar -Dversion=1.0.0 -Dpackaging=jar
+mvn install:install-file -Dfile=path/to/your/local-jar.jar -DgroupId=example -DartifactId=local-jar -Dversion=1.0.0 -Dpackaging=jar
 ```
+> 特别注意,`-DgroupId=zhouyafeng`好像不能写成 `-DgroupId=com.example`这样的形式 version也不能写成`-Dversion=1.0.0`要不然执行不下去
 
 ### 在 pom.xml 中添加依赖
 现在可以在项目的 `pom.xml` 文件中添加对本地jar包的依赖了。例如：
 
 ```xml
 <dependency>
-    <groupId>com.example</groupId>
+    <groupId>example</groupId>
     <artifactId>local-jar</artifactId>
-    <version>1.0.0</version>
+    <version>100</version>
 </dependency>
 ```
 
