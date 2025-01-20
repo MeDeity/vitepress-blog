@@ -145,6 +145,7 @@ vue-cli项目打包指令(更新的项目现在已经基本转向vite了-vite,�
 > cd dist&tar -zcvf ai-admin-ui.tar.gz * 该命令的作用进入dist目录并将当前目录下的文件打包成ai-admin-ui.tar.gz压缩包文件(方便后续上传)
 
 ![构建脚本shell](images/2025/01/17/构建脚本shell.png)
+> 图片中的脚本有个小错误,应该是 cp /usr/local/jar/ai-admin-ui.tar.gz...芭啦芭啦樱之花
 
 到此,我们的任务构建终于结束了.
 
