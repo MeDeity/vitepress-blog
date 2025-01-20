@@ -144,6 +144,18 @@ vue-cli项目打包指令(更新的项目现在已经基本转向vite了)
 
 > 前端项目一般需要有运行容器,例如Tomcat,nginx 或者直接使用docker进行镜像安装,我们以上的仅仅是将目标物自动构建并上传到远程服务器中的容器中.如果需要可视化的配置推荐使用宝塔
 
+示例: nginx映射(非本篇重点,可忽略)
+```bash
+server {
+    listen 9001;
+    server_name _9001;
+
+    # 前端页面的路径
+    root /www/wwwroot/ai-admin-ui/dist;
+    index index.php index.html index.htm default.php default.htm default.html;
+}
+```
+
 ### 遇到的一些问题
 
 1. Webhook报错 webhook.ALLOWED_HOST_LIST setting
@@ -163,3 +175,4 @@ ALLOWED_HOST_LIST = xx.xx.xx.xx
 
 ### 参考链接
 1. [Jenkins自动打包部署VUE项目](https://blog.csdn.net/qq_41085087/article/details/143161461)
+2. [gitea社区问答-ALLOWED_HOST_LIST问题](https://forum.gitea.com/t/webhook-webhook-allowed-host-list-setting/4655/3)
