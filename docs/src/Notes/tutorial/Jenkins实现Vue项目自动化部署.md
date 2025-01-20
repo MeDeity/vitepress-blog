@@ -5,6 +5,23 @@ desc: "Jenkins实现Vue项目自动化部署"
 tags: "Jenkins,Vue"
 updateTime: "2025-01-17"
 ---
+
+# Jenkins实现Vue项目自动化部署
+
+### 目标
+我们在编写代码并测试通过后,希望能够自动部署到线上,我们期望在dev分支上的更改,当同步到master分支时,会自动发起构建
+
+```bash
+# 新建dev分支进行项目开发
+git checkout -b dev
+# dev 分支进行更新 & 长时间的测试
+git add . & git commit -m "something update" & git push origin dev
+# 合并到主分支
+git checkout master & git merge dev & git push origin master
+
+# 触发自动化部署....
+```
+
 ### 安装NodeJs插件
 Vue项目自动化部署需要确保Jenkins服务器上安装了NodeJs插件，否则无法执行npm命令。
 在插件管理页面搜索NodeJs插件，并安装。安装后会出现在已安装的插件列表中。如下图所示
@@ -110,6 +127,20 @@ H H 1,15 1-11 *
 
 ![选择Node环境](images/2025/01/17/选择Node环境.png)
 
+vue-cli项目打包指令(更新的项目现在已经基本转向vite了)
+![项目打包指令](images/2025/01/17/项目打包指令.png)
+
+`Vue`项目发布时需要安装相关依赖,由于国内网络因素,我们使用了阿里云的npm镜像.其中`npm run build:prod`是我们执行设置的打包指令
+![项目依赖安装](images/2025/01/17/项目依赖安装.png)
+
+打包完成后,会在`dist`目录下输出构建后的文件,我们使用命令对其进行打包上传到远程服务器上
+> cd dist&tar -zcvf ai-admin-ui.tar.gz * 该命令的作用进入dist目录并将当前目录下的文件打包成ai-admin-ui.tar.gz压缩包文件(方便后续上传)
+
+![构建脚本shell](images/2025/01/17/构建脚本shell.png)
+
+到此,我们的任务构建终于结束了.
+
+> 前端项目一般需要有运行容器,例如Tomcat,nginx 或者直接使用docker进行镜像安装,我们以上的仅仅是将目标物自动构建并上传到远程服务器中的容器中.如果需要可视化的配置推荐使用宝塔
 
 
 
