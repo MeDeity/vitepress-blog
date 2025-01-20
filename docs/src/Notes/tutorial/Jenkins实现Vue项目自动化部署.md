@@ -119,6 +119,8 @@ H H 1,15 1-11 *
 
 ![webhook密码设置](images/2025/01/17/webhook密码设置.png)
 
+回调设置
+
 ![设置webhook的回调url](images/2025/01/17/设置webhook的回调url.png)
 
 
@@ -142,7 +144,22 @@ vue-cli项目打包指令(更新的项目现在已经基本转向vite了)
 
 > 前端项目一般需要有运行容器,例如Tomcat,nginx 或者直接使用docker进行镜像安装,我们以上的仅仅是将目标物自动构建并上传到远程服务器中的容器中.如果需要可视化的配置推荐使用宝塔
 
+### 遇到的一些问题
 
+1. Webhook报错 webhook.ALLOWED_HOST_LIST setting
+使用公司的gitea配置webhook报错
+
+![ALLOWED_HOST_LIST](images/2025/01/17/ALLOWED_HOST_LIST.png)
+然后在[gitea社区问答](https://forum.gitea.com/t/webhook-webhook-allowed-host-list-setting/4655/3)中找到了这个答案
+```bash
+修改 /data/gitea/conf/app.ini 配置文件，确保存在如下配置
+
+[webhook]
+ALLOWED_HOST_LIST = xx.xx.xx.xx
+
+重启服务就好了
+```
+> 这里的`xx.xx.xx.xx` 是`jenkins`所在的服务器IP
 
 ### 参考链接
 1. [Jenkins自动打包部署VUE项目](https://blog.csdn.net/qq_41085087/article/details/143161461)
