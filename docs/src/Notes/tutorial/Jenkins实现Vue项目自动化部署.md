@@ -159,7 +159,7 @@ ALLOWED_HOST_LIST = xx.xx.xx.xx
 
 重启服务就好了
 ```
-> 这里的`xx.xx.xx.xx` 是`jenkins`所在的服务器IP
+> 这里的`xx.xx.xx.xx` 是`jenkins`所在的服务器IP,如果实在没法开放,那么就需要构建的时候上jenkins上手动点一下构建
 
 ### 参考链接
 1. [Jenkins自动打包部署VUE项目](https://blog.csdn.net/qq_41085087/article/details/143161461)
