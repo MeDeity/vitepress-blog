@@ -33,3 +33,91 @@ dependencies {
     implementation "androidx.navigation:navigation-compose:2.7.7"  // 使用最新版本
 }
 ```
+这个导航库有三个关键的核心组件
+1. NavController：管理导航逻辑和返回栈
+2. NavHost：容器，用于承载不同页面（Composable函数）
+3. NavGraph：定义页面间的导航关系
+
+### 结合ViewModel进行状态管理
+Composable 函数仅负责渲染 UI,而ViewModel 负责管理业务逻辑和 UI 无关的状态，一般采用Hilt注入框架避免`ViewModel`直接实例化,
+
+在使用ViewModel需要引入
+```gradle
+implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0"  // 最新版本
+```
+获取ViewModel实例的几种方式
+1. 直接通过 viewModel() 函数获取（需 Compose 环境）：
+```kotlin
+@Composable
+fun MyScreen(viewModel: MyViewModel = viewModel()) {
+    // 使用 viewModel 中的状态和方法
+}
+```
+2. 通过 Activity/Fragment 传递 ViewModel（适合跨组件共享）：
+```kotlin
+// 在 Activity 中初始化
+val viewModel: MyViewModel by viewModels()
+setContent { MyScreen(viewModel) }
+```
+
+3. 依赖注入：使用 Hilt 或 Koin 实现 ViewModel 的依赖注入（提高可测试性）
+以下是一个ViewModel定义
+```kotlin
+@HiltViewModel
+class MyViewModel @Inject constructor() : ViewModel() {
+    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+
+    init {
+        loadData()
+    }
+
+    private fun loadData() {
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading
+            try {
+                val data = fetchDataFromNetwork()
+                _uiState.value = UiState.Success(data)
+            } catch (e: Exception) {
+                _uiState.value = UiState.Error(e.message)
+            }
+        }
+    }
+
+    /**逻辑状态 */
+    sealed class UiState {
+        object Loading : UiState()
+        data class Success(val data: String) : UiState()
+        data class Error(val message: String?) : UiState()
+    }
+}
+```
+在这个`ViewModel`中,我们定义了逻辑所需的状态`UiState`,`MutableStateFlow`是 Kotlin 协程中的 热流（Hot Flow），始终持有最新的状态值,通过 `asStateFlow()` 转换为只读的 StateFlow，防止外部直接修改状态
+当`_uiState`的数据发生变化时,对外暴露的`uiState`会立即通知所有活跃的收集者`Collector`,而`collectAsState()`会将`Flow`转化为`Compose`所需的`State`,当Flow发出新值,State会更新，从而触发组件重组
+
+```kotlin
+@Composable
+fun MyScreen(viewModel: MyViewModel = hiltViewModel()) { 
+    val uiState by viewModel.uiState.collectAsState()
+
+    when (val state = uiState) {
+        is UiState.Loading -> {
+            // 显示加载动画
+            CircularProgressIndicator()
+        }
+        is UiState.Success -> {
+            // 显示数据
+            Text("Data: ${state.data}")
+        }
+        is UiState.Error -> {
+            // 显示错误信息，并提供重试按钮
+            Column {
+                Text("Error: ${state.message}")
+                Button(onClick = { viewModel.loadData() }) {
+                    Text("Retry")
+                }
+            }
+        }
+    }
+}
+```
