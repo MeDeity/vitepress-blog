@@ -52,6 +52,11 @@ private val viewModel: MyViewModel by viewModels()
 ### Data Persistence 数据持久化
 Room 是目前 Android 推荐的数据库工具
 
+### Compose Navigation
+`NavHost`是`Navigation`库中的重要组件,`NavHost`相当于是`铁路网络`,导航目标（Destination）更像是一个个车站,`NavController`则是列车调度中心，负责决定列车（应用状态）在哪个轨道上运行，以及何时进站、出站.
+
+有一点需要注意的是，一个`NavHost`对应一个`NavHostController`
+
 
 ### Android开发 Jetpack Compose 与xml的混合开发AndroidView
 虽然jetpack compose 在逐渐完善,
@@ -148,6 +153,26 @@ fun Test() {
 }
 ```
 
+### 一些常见的需求实现案例
+
+1. 沉浸式状态栏
+```kotlin
+ProvideWindowInsets() {
+    val systemUiController = rememberSystemUiController()
+    SideEffect {
+        systemUiController.setStatusBarColor(Color.Transparent, darkIcons = false)
+    }
+    Surface(
+        modifier = Modifier.fillMaxSize().navigationBarsPadding(),
+        color = customScheme.background
+    ) {
+        //content
+    }
+}
+```
+
+
+
 
 ### 参考链接
 1. [Jetpack Compose版来啦！高仿微信朋友圈大图缩放、切换、预览功能](https://juejin.cn/post/7091206855153877000/)
@@ -161,3 +186,5 @@ fun Test() {
 9. [Jetpack Compose系列](https://www.cnblogs.com/joy99/p/18035950)
 10. [语音条](https://github.com/GitLqr/LQRAudioRecord)
 11. [Kotlin高仿微信-第11篇-单聊-语音](https://blog.csdn.net/maoning20080808/article/details/128109017)
+12. [使用 Material 3 在 Compose 中设置主题](https://developer.android.google.cn/codelabs/jetpack-compose-theming?hl=zh-cn)
+13. [material-theme-builder 主题构建器](https://material-foundation.github.io/material-theme-builder/)

@@ -24,8 +24,164 @@ Jetpack Compose框架会自动处理状态变化后的更新(简化了传统View
 
 ### Jetpack Compose 使用基础
    我们这里使用一个简单的示例来演示下Jetpack Compose在构建UI上的使用场景
-   ![一张聊天列表页面](https://www.baidu.com)
-   要实现这样的一张UI图片,需要怎么做
+  ![简单的聊天页面](images/2025/02/26/聊天页面.png)
+   要实现这样的一张UI图片,需要怎么做,在传统的Android View体系中,我们需要编写一个布局文件,然后在Activity中加载这个布局，并通过findViewById拿到控件实例进行UI的构建,但是在Jetpack Compose中,我们只需要编写一个Composable函数即可实现这个UI的构建
+
+### 编写第一个Composable函数
+
+我们新建一个kt文件,并编写以下的模版代码,`@Composable`注解表示该UI组件可以被组合使用,`@Preview`注解表示该Composable函数可以在Android Studio中预览效果
+```java
+@Composable
+fun TechView() {
+
+}
+
+@Preview(showBackground = true)
+@Composable
+fun Preview() {
+    TechView()
+}
+```
+在Android Studio中,点开Split标签可以看到如下界面:
+![Alt text](images/2025/02/26/jetpackcompose空模版.png)
+
+有了这个模版代码,接下来我们的界面实现就可以做到所见及所得
+
+我们编写了一个简单的`SimpleText`函数,并将其塞到了`TechView`页面的`Column`布局中,可以看到预览效果如下所示:
+
+```kotlin
+@Composable
+fun TechView() {
+    Column(modifier = Modifier.fillMaxSize()) {
+        SimpleText()
+    }
+}
+
+@Composable
+fun SimpleText(){
+    Text(
+        text = "很简单的文本",
+        color = Color.White,
+        modifier = Modifier
+            .clip(RoundedCornerShape(10.dp))
+            .background(color = Color(0xFF468CFF).copy(alpha = 0.8f))
+            .padding(horizontal = 15.dp, vertical = 10.dp),
+    )
+}
+```
+等待渲染完成后,我们可以看到如下的效果
+
+![简单的compose文本](images/2025/02/26/简单的compose文本.png)
+在Jetpack Compose UI框架中，修饰符（Modifier）的执行顺序是先执行后添加的修饰符。添加顺序不同,效果会有差异,如上示例的执行顺序是padding->background->clip。
+
+我们尝试反转下Modifier的执行顺序,如下所示:
+
+```kotlin
+@Composable
+fun TechView() {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(horizontal = 15.dp, vertical = 10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        SimpleText()
+        //距离分割符
+        Spacer(modifier = Modifier.height(10.dp))
+        ConvertSimpleText()
+    }
+}
+
+@Composable
+fun ConvertSimpleText() {
+    Text(
+        text = "反转Modifier的执行顺序",
+        color = Color.White,
+        modifier = Modifier
+            .padding(horizontal = 15.dp, vertical = 10.dp)
+            .background(color = Color(0xFF468CFF).copy(alpha = 0.8f))
+            .clip(RoundedCornerShape(10.dp)),
+    )
+}
+```
+![修饰符执行顺序测试](images/2025/02/26/修饰符执行顺序测试.png)
+可以看到,反转后,圆角都被padding覆盖了,基本看不出圆角效果了。
+
+当然通过这两个简单的示例,我们可以管中窥豹,Jetpack Compose的强大之处在于其声明式的UI构建方式，通过组合不同的Composable函数和修饰符，我们可以轻松地创建复杂且响应式的用户界面
+
+### 构建聊天页面
+回到我们之前的聊天页面,我们尝试使用Jetpack Compose来实现这个界面，首先需要解构页面的各个组件.
+我们可以将聊天页面拆分为以下几个部分：
+1. 顶部导航栏：下拉选择控件
+> 就像传统View体系一样,jetpack compose也有自己的内置组件可以实现特定的需求,这个控件我们可以使用下拉菜单控件`DropdownMenu`,下拉选择控件`ExposedDropdownMenuBox`来实现,当然如果有特殊需求,我们也可以自定义控件来实现这个功能。
+
+2. 聊天内容区域：显示消息列表
+
+顶部导航栏解构
+拆解后的顶部导航栏应该是 有一个下拉状态栏靠左侧.因此整体是一个Row横向布局,下拉选择控件靠左侧，右侧无内容。
+
+```kotlin
+/**仿TopBar*/
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NavTopBar(options:List<String>) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOption by remember { mutableStateOf(options[0]) }
+
+    Row {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            modifier = Modifier.widthIn(max = 150.dp),
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            Row(
+                Modifier
+                    .background(
+                        colorResource(id = R.color.white),
+                        shape = RoundedCornerShape(20.dp)
+                    )
+                    .height(40.dp)
+                    .border(
+                        width = 1.dp, color = Color.LightGray,
+                        shape = RoundedCornerShape(20.dp)
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                BasicTextField(
+                    value = selectedOption,
+                    onValueChange = { /* Handle text change */ },
+                    enabled = false,
+                    modifier = Modifier
+                        .padding(start = 15.dp)
+                )
+                IconButton(onClick = { expanded = !expanded }) {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                }
+            }
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                options.forEach { selectionOption ->
+                    DropdownMenuItem(
+                        onClick = {
+                            selectedOption = selectionOption
+                            expanded = false
+                        },
+                        text = { Text(selectionOption) }
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.weight(1f))
+    }
+}
+
+```
+其中`ExposedDropdownMenuBox`是盒子布局,有点类似传统View中的`FrameLayout`层叠布局
+
+> 实现上,我们采用了`BasicTextField`,虽然`OutlinedTextField`更合适,因为`OutlinedTextField`还内置支持尾随图标,但在使用过程中发现,`OutlinedTextField`限制了默认的最小宽高,所以使用`BasicTextField`进行更自由的定制.
+
 
 ### 导航与多页面
    一个应用是由很多页面组成的,传统的View体系一般是通过`startActivity`实现页面的跳转,
@@ -121,6 +277,25 @@ fun MyScreen(viewModel: MyViewModel = hiltViewModel()) {
                 }
             }
         }
+    }
+}
+```
+
+
+### 一些常见的需求实现案例
+
+1. 沉浸式状态栏
+```kotlin
+ProvideWindowInsets() {
+    val systemUiController = rememberSystemUiController()
+    SideEffect {
+        systemUiController.setStatusBarColor(Color.Transparent, darkIcons = false)
+    }
+    Surface(
+        modifier = Modifier.fillMaxSize().navigationBarsPadding(),
+        color = customScheme.background
+    ) {
+        //content
     }
 }
 ```
