@@ -268,7 +268,7 @@ fun ChatMsg(msg:String,isCurrentUser:Boolean = true) {
 
 > 另外我们还需要限制气泡的最大宽度,避免气泡内容过长导致气泡宽度过大。这里我们可以使用`LocalConfiguration.current.screenWidthDp.dp`获取当前屏幕宽度的dp值，并将其转换为Dp类型,代码中我们要求气泡的最大宽度不超过屏幕宽度的60%
 
-### 聊天列表整合
+#### 聊天列表整合
 
 利用`Jetpack Compose`的组合特性,现在我们要把头像和聊天气泡整合到一起,形成一个完整的对话Item
 ```kotlin
@@ -357,9 +357,12 @@ fun TechView() {
 ```
 ![最终效果](images/2025/02/26/最终效果.png)
 
+> `Scaffold` 是Jetpack Compose的一个布局容器，它提供了基本的界面结构，如顶部栏（TopBar）、底部导航等。通过`Scaffold`可以很方便的构建出带有这些基础组件的页面布局,一个微信风格的主界面就可以通过`Scaffold`组件轻松的实现.
+
 ### 导航与多页面
    一个应用是由很多页面组成的,传统的View体系一般是通过`startActivity`实现页面的跳转,
-在Jetpack Compose中也有对应的库来实现页面的跳转,
+在Jetpack Compose中也有对应的库来实现页面的跳转`navigation-compose`,这个库提供了强大的导航能力，可以轻松实现页面间的跳转和回退。这里我们可以利用这个库实现微信风格的多页面应用。
+
 在项目的 build.gradle (Module级别) 中添加依赖：
 ```gradle
 dependencies {
@@ -370,6 +373,128 @@ dependencies {
 1. NavController：管理导航逻辑和返回栈
 2. NavHost：容器，用于承载不同页面（Composable函数）
 3. NavGraph：定义页面间的导航关系
+
+首先我们定义了底部导航的三个选项，并通过枚举封装了每个选项的相关属性
+```kotlin
+sealed class AiBottomNavItem(var title:String,var normalIcon:Int,var selectIcon:Int,var route:String){
+    object Finding: AiBottomNavItem("首页", R.drawable.icon_home,R.drawable.icon_home_select,AiPlayRoutes.Home.route)
+    object Message: AiBottomNavItem("对话", R.drawable.icon_history,R.drawable.icon_history_select,AiPlayRoutes.History.route)
+    object Mine: AiBottomNavItem("我的", R.drawable.icon_me,R.drawable.icon_me_select,AiPlayRoutes.SystemSetting.route)
+}
+```
+> 这里我们使用了密封类`sealed class`,它是一种特殊的类，编译器会知道所有的子类，因此你可以确保覆盖所有的情况，这在状态管理或错误处理中非常有用。在这个例子中，我们定义了一个密封的枚举`AiBottomNavItem`,它有三个实例：Finding、Message和Mine
+
+再次基础上,我们定义了所需的底部导航条
+```kotlin
+/** 底部导航条 */
+@Composable
+fun BottomNavBar(navController: NavController) {
+    /**
+     * 底部导航元素*/
+    val items = listOf(
+        AiBottomNavItem.Finding,
+        AiBottomNavItem.Message,
+        AiBottomNavItem.Mine
+    )
+    BottomNavigation{
+        //存储了导航中回退栈的信息
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        //获取当前的路由状态
+        val currentRoute = navBackStackEntry?.destination?.route
+
+        /**
+         * 遍历列表生成三个底部Item*/
+        items.forEach { item ->
+            val curSelected = currentRoute == item.route;
+            BottomNavigationItem(
+                icon = {
+                    Icon(
+                        painterResource(id = if (curSelected) item.selectIcon else item.normalIcon),
+                        item.title, modifier = Modifier.size(24.dp)
+                    )
+                },
+                label = { Text(item.title, fontSize = 12.sp) },
+                alwaysShowLabel = true,
+                selected = curSelected,
+                unselectedContentColor = customScheme.icon,
+                selectedContentColor = customScheme.iconCurrent,
+                onClick = {
+                    navController.navigate(item.route) {
+                        // 弹出到图形的开始目的地
+                        // 避免建立大量目的地
+                        // 在用户选择项目时显示在后堆栈上
+                        navController.graph.startDestinationRoute?.let { route ->
+                            popUpTo(route) {
+                                saveState = true
+                            }
+                        }
+                        //在以下情况下避免同一目标的多个副本(如果目的地已经位于栈顶，则不会创建新的实例，而是重新使用当前实例)-有点类似于安卓的singleTop模式
+                        //重新选择同一项目
+                        launchSingleTop = true
+                        //重新选择以前选定的项目时恢复状态
+                        restoreState = true
+                    }
+                }
+            )
+        }
+    }
+}
+```
+现在我们可以定义导航体系了.
+```kotlin
+@Composable
+fun NavigationHomeGraph(bottomNavHostController: NavHostController,navHostController: NavHostController, viewModel: AiPlayViewModel, innerPadding:PaddingValues){
+    /** 底部导航栏三个个界面路线图*/
+    NavHost(bottomNavHostController, startDestination = BottomNavItem.MailList.route){
+
+        composable(AiBottomNavItem.Finding.route){
+            HomeView(navHostController,viewModel,innerPadding)
+        }
+
+        composable(AiBottomNavItem.Message.route){
+            HistoryView(viewModel,innerPadding)
+        }
+
+        composable(AiBottomNavItem.Mine.route){
+            SystemSettingView(navHostController,viewModel,innerPadding)
+        }
+
+    }
+}
+```
+
+现在我们来看看最终的完整代码
+```kotlin
+@Composable
+fun MainPage(navCtrl: NavHostController, viewModel: AiPlayViewModel) {
+
+    val systemUiController = rememberSystemUiController()
+    val bottomNavCtrl = rememberNavController()
+
+    // 设置沉浸式状态栏
+    SideEffect {
+        systemUiController.setStatusBarColor(
+            color = Color.Transparent,
+            darkIcons = false
+        )
+        // Additionally, you can set the navigation bar color if needed
+        systemUiController.setNavigationBarColor(
+            color = Color.Transparent,
+            darkIcons = false
+        )
+    }
+
+    Scaffold(
+        modifier = Modifier.navigationBarsPadding(),
+        bottomBar = {
+            BottomNavBar(bottomNavCtrl)
+        }
+    ) { innerPadding ->
+        NavigationHomeGraph(bottomNavCtrl,navCtrl, viewModel, innerPadding)
+    }
+}
+```
+
 
 ### 结合ViewModel进行状态管理
 Composable 函数仅负责渲染 UI,而ViewModel 负责管理业务逻辑和 UI 无关的状态，一般采用Hilt注入框架避免`ViewModel`直接实例化,
