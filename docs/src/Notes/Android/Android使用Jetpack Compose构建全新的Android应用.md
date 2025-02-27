@@ -360,8 +360,9 @@ fun TechView() {
 > `Scaffold` 是Jetpack Compose的一个布局容器，它提供了基本的界面结构，如顶部栏（TopBar）、底部导航等。通过`Scaffold`可以很方便的构建出带有这些基础组件的页面布局,一个微信风格的主界面就可以通过`Scaffold`组件轻松的实现.
 
 ### 导航与多页面
-   一个应用是由很多页面组成的,传统的View体系一般是通过`startActivity`实现页面的跳转,
-在Jetpack Compose中也有对应的库来实现页面的跳转`navigation-compose`,这个库提供了强大的导航能力，可以轻松实现页面间的跳转和回退。这里我们可以利用这个库实现微信风格的多页面应用。
+   当然一个应用是由很多页面组成的,传统的View体系一般是通过`startActivity`实现页面的跳转,
+在Jetpack Compose中也有对应的库来实现页面的跳转`navigation-compose`,这个库提供了强大的导航能力，可以轻松实现页面间的跳转和回退。
+这里我们可以利用这个库实现微信风格的多页面应用。
 
 在项目的 build.gradle (Module级别) 中添加依赖：
 ```gradle
@@ -384,7 +385,7 @@ sealed class AiBottomNavItem(var title:String,var normalIcon:Int,var selectIcon:
 ```
 > 这里我们使用了密封类`sealed class`,它是一种特殊的类，编译器会知道所有的子类，因此你可以确保覆盖所有的情况，这在状态管理或错误处理中非常有用。在这个例子中，我们定义了一个密封的枚举`AiBottomNavItem`,它有三个实例：Finding、Message和Mine
 
-再次基础上,我们定义了所需的底部导航条
+在次基础上,利用`BottomNavBar`组件我们定义了所需的底部导航Item
 ```kotlin
 /** 底部导航条 */
 @Composable
@@ -420,7 +421,7 @@ fun BottomNavBar(navController: NavController) {
                 selectedContentColor = customScheme.iconCurrent,
                 onClick = {
                     navController.navigate(item.route) {
-                        // 弹出到图形的开始目的地
+                        // 优化相关:弹出到图形的开始目的地
                         // 避免建立大量目的地
                         // 在用户选择项目时显示在后堆栈上
                         navController.graph.startDestinationRoute?.let { route ->
@@ -494,9 +495,14 @@ fun MainPage(navCtrl: NavHostController, viewModel: AiPlayViewModel) {
     }
 }
 ```
+前面我们说过.`Scaffold` 是Jetpack Compose的一个布局容器,翻译成中文就是脚手架，它提供了基本的界面结构，如顶部栏（TopBar）、底部导航等。
+
+![主页效果图](images/2025/02/26/主页效果图.jpg)
 
 
 ### 结合ViewModel进行状态管理
+
+
 Composable 函数仅负责渲染 UI,而ViewModel 负责管理业务逻辑和 UI 无关的状态，一般采用Hilt注入框架避免`ViewModel`直接实例化,
 
 在使用ViewModel需要引入
@@ -520,6 +526,10 @@ setContent { MyScreen(viewModel) }
 
 3. 依赖注入：使用 Hilt 或 Koin 实现 ViewModel 的依赖注入（提高可测试性）
 以下是一个ViewModel定义
+
+### View 与 ViewModel 进行交互
+在`ViewModel`中定义状态和逻辑，然后在 Composable 函数中使用这些状态。
+
 ```kotlin
 @HiltViewModel
 class MyViewModel @Inject constructor() : ViewModel() {
@@ -550,7 +560,8 @@ class MyViewModel @Inject constructor() : ViewModel() {
     }
 }
 ```
-在这个`ViewModel`中,我们定义了逻辑所需的状态`UiState`,`MutableStateFlow`是 Kotlin 协程中的 热流（Hot Flow），始终持有最新的状态值,通过 `asStateFlow()` 转换为只读的 StateFlow，防止外部直接修改状态
+ViewModel中定义的状态通常使用`StateFlow`,它是 Kotlin 协程中的冷流（Cold Flow），只有在有收集者时才会发出值，并且只发出最后一个值。当状态发生变化时，所有活跃的收集者（Collector）都会收到通知。`MutableStateFlow`是`StateFlow`的可变版本，用于在 ViewModel 中更新状态。但它不对外暴露修改状态的方法，而是通过`asStateFlow()`转换为只读的 StateFlow。这样可以防止外部直接修改状态，保持状态的不可变性。
+
 当`_uiState`的数据发生变化时,对外暴露的`uiState`会立即通知所有活跃的收集者`Collector`,而`collectAsState()`会将`Flow`转化为`Compose`所需的`State`,当Flow发出新值,State会更新，从而触发组件重组
 
 ```kotlin
@@ -579,6 +590,12 @@ fun MyScreen(viewModel: MyViewModel = hiltViewModel()) {
     }
 }
 ```
+ 在上面的例子中，当页面进入时，`viewModel.uiState`的初始值是 Loading。当数据加载完成后，它会变成 Success 状态，并显示相应的 UI。如果发生错误，则显示 Error 状态,此时会显示一个Retry按钮，点击后会触发`loadData`方法重新加载数据。整个状态修改过程都是在ViewModel中完成的，而UI的更新则由Composable函数自动处理。这样既保证了状态的一致性，又使得代码更加清晰和易于维护。
+
+> 用户触发Action->ViewModel修改状态->Composable函数自动更新UI
+
+
+> 注意：`collectAsState()` 只在 Composable 中使用，它将 Flow 转换为 State。在非 Composable 函数中，你应该直接调用 `Flow.collect()` 来收集数据。
 
 
 ### 一些常见的需求实现案例
@@ -598,6 +615,7 @@ ProvideWindowInsets() {
     }
 }
 ```
+待补充...
 
 ### 参考链接
 1. [Android 全新的 UI 框架](https://www.cnblogs.com/joy99/p/18035909)
