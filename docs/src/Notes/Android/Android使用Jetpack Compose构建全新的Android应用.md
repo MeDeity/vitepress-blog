@@ -5,6 +5,7 @@ desc: "Android使用Jetpack Compose构建全新的Android应用"
 tags: "Android"
 updateTime: "2025-02-24"
 ---
+# Android使用Jetpack Compose构建全新的Android应用
 
 ### Jetpack Compose 的优势
    传统的Android View 体系是一种命令式UI,开发人员需要手动操作UI组件的状态,
