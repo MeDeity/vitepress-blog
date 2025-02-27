@@ -192,14 +192,43 @@ fun NavTopBar(options:List<String>) {
 `Column`是一个静态布局组件，它会立即渲染所有子组件,用于子组件数量较少或固定的情况
 
 ![对话item](images/2025/02/26/对话item.png)
+
+#### 关于头像的实现
+
 对话item的布局大致可以分为两部分，左侧气泡和右侧气泡
 左侧气泡一般是我方会话的气泡,右侧是对方会话的气泡,都是典型的`Row`横向布局,只不过头像和气泡的对调,气泡的背景色也不同。这个我们可以通过简单的逻辑判断,将实现写在一个Composable函数中,并通过参数控制气泡的对调。
 
-聊天Item的Composable函数实现如下所示:
+这个头像是一个圆形图片,我们可以使用对应的`CircleImage`组件来实现或者我们可以`Image`并借助强大的`Modifier`修饰符来实现圆形图片组件，代码如下所示:
 ```kotlin
-
-
+@Composable
+fun Avatar(painter: Painter,scale:ContentScale = ContentScale.Crop) {
+    Image(
+        painter = painter,
+        contentDescription = "Avatar",
+        contentScale = scale,
+        modifier = Modifier
+            .size(40.dp)
+            .clip(CircleShape)
+            .border(0.5.dp, Color.Gray, CircleShape)
+    )
+}
 ```
+
+> 这里我们限定了图片的宽高为40dp,并通过`clip(CircleShape)`修饰符实现了圆形裁剪，最后通过`border`修饰符添加了边框
+
+这里需要说明下图像的缩放策略`ContentScale`
+|-|-|
+|策略|说明|
+|Fit|保持图像比例，填充边界但不裁剪|
+|Crop|裁剪边界，保持图像比例不变|
+|Inside|类似于Fit，但图片会居中显示，且宽度和高度都不会超过容器的对应尺寸|
+|FillWidth|填充宽度，保持图像比例不变|
+|FillHeight|填充高度，保持图像比例不变|
+|FillBounds|填充边界，可能导致图像变形|
+|None|不缩放，保持图像原始大小|
+
+![ContentScale几种模式](images/2025/02/26/ContentScale几种模式.png)
+
 
 
 ### 导航与多页面
