@@ -178,9 +178,28 @@ fun NavTopBar(options:List<String>) {
 }
 
 ```
-其中`ExposedDropdownMenuBox`是盒子布局,有点类似传统View中的`FrameLayout`层叠布局
+其中`ExposedDropdownMenuBox`是盒子布局,有点类似传统View中的`FrameLayout`层叠布局,越后面添加的显示在顶层,以确保不会被前面的控价遮挡,我们使用`Row`空间实现横向布局,通过`BasicTextField`和`IconButton`组合出下拉选择控件,`ExposedDropdownMenu`实现下拉菜单的展示。最后使用`Spacer`实现占位.如果右侧还有其他控件仍可继续添加,这里我们使用了一些状态管理,通过`mutableStateOf`定义下拉菜单的展开状态和当前选中的选项。确保组件重组的时候,下拉菜单的状态和选中项能够保持记录不会丢失.
+
+以上的代码效果如下:
+![Alt text](images/2025/02/26/仿TopBar部分.png)
 
 > 实现上,我们采用了`BasicTextField`,虽然`OutlinedTextField`更合适,因为`OutlinedTextField`还内置支持尾随图标,但在使用过程中发现,`OutlinedTextField`限制了默认的最小宽高,所以使用`BasicTextField`进行更自由的定制.
+
+### 聊天列表的实现
+传统的View体系一般是通过`RecyclerView`来实现列表的展示,在Jetpack Compose中也有对应的组件实现列表的展示，那就是`LazyColumn`,`LazyRow`,`LazyVerticalGrid`,`LazyHorizontal`,`Column`,`Row`等,这里我们使用`LazyColumn`来实现聊天列表的展示。
+
+> `LazyColumn`是一个动态布局组件，它只会渲染屏幕上可见的子组件,适用于子组件数量较多或动态变化的情况，因为它可以有效地回收和重用子组件，减少内存占用和提升性能。
+`Column`是一个静态布局组件，它会立即渲染所有子组件,用于子组件数量较少或固定的情况
+
+![对话item](images/2025/02/26/对话item.png)
+对话item的布局大致可以分为两部分，左侧气泡和右侧气泡
+左侧气泡一般是我方会话的气泡,右侧是对方会话的气泡,都是典型的`Row`横向布局,只不过头像和气泡的对调,气泡的背景色也不同。这个我们可以通过简单的逻辑判断,将实现写在一个Composable函数中,并通过参数控制气泡的对调。
+
+聊天Item的Composable函数实现如下所示:
+```kotlin
+
+
+```
 
 
 ### 导航与多页面
