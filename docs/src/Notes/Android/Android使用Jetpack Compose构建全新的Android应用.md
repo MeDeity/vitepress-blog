@@ -229,6 +229,46 @@ fun Avatar(painter: Painter,scale:ContentScale = ContentScale.Crop) {
 
 ![ContentScale几种模式](images/2025/02/26/ContentScale几种模式.png)
 
+#### 聊天气泡文本内容的实现
+聊天气泡中的问题内容,我们可以通过`Text`组件来实现,关于气泡的圆角效果，我们发现我方的气泡,右上角没有圆角,对方的气泡左上角无需圆角.
+
+```kotlin
+@Composable
+fun ChatMsg(msg:String,isCurrentUser:Boolean = true) {
+    Column(
+        modifier = Modifier
+            .animateContentSize()
+            .background(
+                color = if (isCurrentUser) Color(0xFF737EFF) else Color.LightGray.copy(alpha = 0.5f),
+                shape = RoundedCornerShape(
+                    topStart = if (isCurrentUser) 15.dp else 0.dp,
+                    topEnd = if (isCurrentUser) 0.dp else 15.dp,
+                    bottomStart = 15.dp,
+                    bottomEnd = 15.dp
+                )
+            )
+            .padding(vertical = 10.dp, horizontal = 15.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            modifier = Modifier.widthIn(max = LocalConfiguration.current.screenWidthDp.dp * 0.6f),
+            color = if (isCurrentUser) Color.White else Color.Black,
+            text = msg,
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+            maxLines = Int.MAX_VALUE,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+```
+在构建聊天气泡的文字Item组件时,我们通过`isCurrentUser`标识当前会话是否为我方,通过`RoundedCornerShape`修饰符实现气泡的圆角效果.并通过`animateContentSize()`修饰符实现了内容变化时的动画效果,通过`isCurrentUser`标识结合`RoundedCornerShape`,实现了我们上面提出的不同的会话,圆角效果差异性处理,`isCurrentUser`标识还决定了气泡的背景色
+
+![气泡的文字Item](images/2025/02/26/气泡的文字Item.png)
+
+> 另外我们还需要限制气泡的最大宽度,避免气泡内容过长导致气泡宽度过大。这里我们可以使用`LocalConfiguration.current.screenWidthDp.dp`获取当前屏幕宽度的dp值，并将其转换为Dp类型,代码中我们要求气泡的最大宽度不超过屏幕宽度的60%
+
+### 聊天列表整合
 
 
 ### 导航与多页面
