@@ -270,6 +270,92 @@ fun ChatMsg(msg:String,isCurrentUser:Boolean = true) {
 
 ### 聊天列表整合
 
+利用`Jetpack Compose`的组合特性,现在我们要把头像和聊天气泡整合到一起,形成一个完整的对话Item
+```kotlin
+@Composable
+fun MessageItem(message: String,avatar:Int = R.drawable.bg_splash,isCurrentUser: Boolean) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp, bottom = 8.dp),
+        horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start,
+        verticalAlignment = Alignment.Top
+    ) {
+        if (!isCurrentUser) {
+            Avatar(
+                painterResource(id = avatar)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+
+        ChatMsg(msg = message,isCurrentUser = isCurrentUser)
+
+        if (isCurrentUser) {
+            Spacer(modifier = Modifier.width(8.dp))
+            Avatar(
+                painterResource(id = avatar),
+            )
+        }
+    }
+}
+```
+这里我们通过`Row`横向布局实现了对话Item的整合,并通过`isCurrentUser`标识控制了头像和气泡的对调.
+
+![对话Item效果](images/2025/02/26/对话Item效果.png)
+
+当然实际的产品中，这些对话一般是服务端推送或者客户端直接批量请求的,所以我们需要动态的去展示这些对话列表.我们Mock一个列表，模拟网络请求下来的数据.然后通过`LazyColumn`动态展示这些对话列表
+```kotlin
+val messages = listOf(
+        "Hello! It's nice to meet you",
+        "还没有？",
+        "太棒了，很高兴认识你！我们一定会成为好朋友的。如果你有什么问题，或者需要帮助，随时告诉我哦！我们可以一起学习，一起玩耍，也可以分享彼此的故事。你最喜欢做些什么呢？我们可以从那里开始聊起！"
+    )
+
+LazyColumn(
+    modifier = Modifier
+        .fillMaxSize()
+        .padding(vertical = 8.dp),
+    verticalArrangement = Arrangement.Top
+) {
+    items(messages.size) { index ->
+        // 这里我们通过index % 2 来模拟当前会话是否为我方,这里我们假定偶数索引的对话是我方的，奇数索引的是对方的。
+        MessageItem(message = messages[index], isCurrentUser = index % 2 == 0)
+    }
+}
+```
+以上的代码实现了对话列表的动态展示,现在我们来看看效果.
+![聊天列表](images/2025/02/26/聊天列表模拟.png)
+
+现在再组合上我们最开始的TopBar,我们就可以实现一个完整的聊天界面了.
+```kotlin
+@Composable
+fun TechView() {
+    val options = listOf("张三", "李四", "王五")
+
+    val messages = listOf(
+        "Hello! It's nice to meet you",
+        "还没有？",
+        "太棒了，很高兴认识你！我们一定会成为好朋友的。如果你有什么问题，或者需要帮助，随时告诉我哦！我们可以一起学习，一起玩耍，也可以分享彼此的故事。你最喜欢做些什么呢？我们可以从那里开始聊起！"
+    )
+    Scaffold(modifier = Modifier) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)) {
+            NavTopBar(options = options)
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(vertical = 8.dp, horizontal = 16.dp),
+                reverseLayout = true,
+                verticalArrangement = Arrangement.Top
+            ) {
+                items(messages.size) { index ->
+                    MessageItem(message = messages[index], isCurrentUser = index % 2 == 0)
+                }
+            }
+        }
+    }
+}
+```
+![最终效果](images/2025/02/26/最终效果.png)
 
 ### 导航与多页面
    一个应用是由很多页面组成的,传统的View体系一般是通过`startActivity`实现页面的跳转,
