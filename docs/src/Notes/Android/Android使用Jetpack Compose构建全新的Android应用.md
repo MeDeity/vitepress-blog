@@ -615,8 +615,19 @@ ProvideWindowInsets() {
         //content
     }
 }
+
+2. 收起键盘
+```kotlin
+// 添加在 LoginView 函数开头，其他状态变量附近
+val focusManager = LocalFocusManager.current
+Button(
+    onClick = {
+        // 收起键盘
+        focusManager.clearFocus()
+    },
+    // ... 其他按钮属性 ...
+)
 ```
-待补充...
 
 ### 参考链接
 1. [Android 全新的 UI 框架](https://www.cnblogs.com/joy99/p/18035909)
