@@ -26,6 +26,15 @@ var res = JSON.parse(responseBody);
 //这里因为我们的token是在extra字段中, 所以这里用的是res.extra
 pm.collectionVariables.set("token", res.extra);
 ```
+这里有个小插曲，postman在选择`Auth Type`为`Bearer Token`,会自动附带上`Bearer `,而我们后端返回的时候也加了`Bearer `, 所以这里我们还需要去掉`Bearer `, 否则会导致认证失败,因此我的脚本变成了厦门这样子
+```js
+var res = JSON.parse(responseBody);
+var token = res.extra
+token = token.replace(/^Bearer/, "").trim();
+pm.collectionVariables.set("token", token);
+```
+
+
 
 ![登录接口请求结束后调用脚本保存token值](images/2025/03/25/登录接口请求结束后调用脚本保存token值.png)
 
