@@ -126,17 +126,15 @@ private static void verifyDeviceControlPassword(View v, WorkspaceItemInfo shortc
 `packages/apps/Settings/res/xml/top_level_settings.xml`
 在这个文件中，我们可以新增入口:`应用管控`, 然后在这个页面中添加密码设置和修改的入口.
 ```xml
-<!-- ... existing entries ... -->
 <com.android.settings.widget.HomepagePreference
     android:fragment="com.android.settings.devicecontrol.DeviceControlPasswordSettings"
-    android:icon="@drawable/ic_lock_outline_24dp"
+    android:icon="@drawable/ic_lock"
     android:key="device_control_password"
     android:order="-30"
     android:title="@string/device_control_settings_title"
     android:summary="@string/device_control_settings_summary"
     settings:highlightableMenuKey="device_control_password"
     settings:controller="com.android.settings.devicecontrol.DeviceControlSettingsController"/>
-<!-- ... existing entries ... -->
 ```
 
 这里比较重要的就是`fragment`页面和`controller`控制器了
@@ -154,7 +152,6 @@ fragment: 对应的Fragment类名
 然后我们在strings.xml中添加对应的字符串资源
 ```xml
 <resources>
-    <!-- ... existing strings ... -->
     <string name="set_device_control_password">设置管控密码</string>
     <string name="verify_device_control_password">验证管控密码</string>
     <string name="enter_password">输入密码</string>
@@ -165,7 +162,6 @@ fragment: 对应的Fragment类名
     <string name="password_mismatch_error">两次输入的密码不一致</string>
     <string name="device_control_password_not_set">未设置密码</string>
     <string name="device_control_password_set">已设置密码</string>
-    <!-- ... existing strings ... -->
 </resources>
 ```
 创建 Fragment 类-`DeviceControlPasswordSettings.java`：
