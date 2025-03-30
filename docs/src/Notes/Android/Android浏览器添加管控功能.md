@@ -14,6 +14,9 @@ updateTime: "2025-03-28"
 同时, 我们还需要提供一个设置页面, 允许用户设置密码或者修改密码.
 
 ### 实现步骤
+客制化目錄:
+`FM961L6/CF13/XIAOXING_TABLET_CONTROL`
+
 1. 在Launcher应用中实现浏览器拦截功能
 目前定位到该文件`packages\apps\Launcher3\src\com\android\launcher3\touch\ItemClickHandler.java`是Launcher3中处理点击事件的核心类. 我们可以在这里拦截浏览器启动的事件, 并弹出密码框.
 ```java
@@ -106,6 +109,9 @@ private static void verifyDeviceControlPassword(View v, WorkspaceItemInfo shortc
 </LinearLayout>
 ```
 > 注意对相关的文字进行国际化,这里仅作为演示 `strings.xml`
+位置: `sys\packages\apps\Launcher3\res\values\strings.xml` 
+客制化目录: `FM961L6/CF13/XIAOXING_TABLET_CONTROL/sys\packages\apps\Launcher3\res\values\strings.xml`
+
 ```xml
 <string name="device_control_password_hint">请输入管控密码</string>
 <string name="device_control_title">需要验证</string>
@@ -357,6 +363,43 @@ public class SettingsGateway {
 
 </PreferenceScreen>
 ```
+
+
+### 验证
+切换到`vnd`目录,使用`source zlunch`加载编译环境,使用以下命令编译模块:
+```bash
+#可以看到打开的应用的包名
+adb shell "dumpsys window|grep mCurrentFocus"
+#根据包名查找模块
+adb shell pm path {moduleName}
+make XiaoXingLauncher > buildmodule.log
+# 查看编译进度并查看是否有编译错误
+cat buildmodule.log|grep 100%
+```
+或者全局编译
+```bash
+source zlunch
+source zmk
+./zmkpac.sh
+cat build.log|grep 'ninja failed with'
+cat build.log|grep 'current path'
+```
+
+`Android 14`使用模块编译:
+```bash
+# 以前有执行过就不用了
+cd zcommon ./create_ln.sh
+cd sys/ & make XiaoXingLauncher -j24
+# 模块安装
+
+adb root
+adb remount
+
+adb reboot
+```
+
+
+
 
 ### 开搞
 我拉了个分支`XIAOXING_TABLET_CONTROL`, 用于测试设备应用管控
