@@ -395,8 +395,6 @@ adb reboot
 ```
 
 
-
-
 ### 开搞
 我拉了个分支`XIAOXING_TABLET_CONTROL`, 用于测试设备应用管控
 
@@ -405,6 +403,50 @@ adb reboot
 source zmake zprj/FM961L6/CF13/XIAOXING_TABLET_CONTROL userdebug 20
 ```
 
+
+### 结果
+后面发现是用户跳转到内置浏览器了,把内置浏览器的网址输入隐藏掉,就满足用户需求了
+`sys\packages\apps\Browser2\res\layout\activity_webview_browser.xml`
+```xml
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center">
+    <!--{@ modify @20250331 for hidden input url entry-->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+    <!--@}-->    
+        <EditText
+            android:id="@+id/url_field"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
+            android:singleLine="true"
+            android:inputType="textUri"
+            android:selectAllOnFocus="true"
+            android:imeOptions="actionGo"
+            android:importantForAutofill="no" />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/breadcrumb_arrow_black"
+            android:contentDescription="@string/load_url"
+            android:onClick="loadUrlFromUrlBar" />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/item_more_black"
+            android:contentDescription="@string/menu_about"
+            android:onClick="showPopup" />
+    </LinearLayout>
+</LinearLayout>
+```
 
 ### 参考链接
 1. [Android 系统进入设置项需要输入密码](https://blog.csdn.net/lancelots/article/details/85064635)
