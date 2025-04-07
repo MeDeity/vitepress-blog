@@ -168,5 +168,8 @@ JNIEXPORT void JNICALL Java_vip_inode_demo_opusaudiodemo_utils_OpusUtils_destroy
 
 我这这个项目的基础上接入了流式Opus的实现,(LibOpusAndroidDemo)[https://github.com/MeDeity/LibOpusAndroidDemo]由于里面涉及公司的数据未脱敏,私有化
 
+### 总结
+整体上感觉,Opus在编码界面上速度还是很快的.
+
 ### 参考链接
 1. [在Android中使用Opus（编译使用Opus so库）](https://inodevip.github.io/Android-Use-Opus-Audio-Lib/)
