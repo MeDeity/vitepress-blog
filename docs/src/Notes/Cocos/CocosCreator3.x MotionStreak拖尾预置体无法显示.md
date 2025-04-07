@@ -5,7 +5,10 @@ desc: "CocosCreator3.x MotionStreak拖尾预置体无法显示笔记"
 tags: "Cocos, 预置体"
 updateTime: "2024-09-06"
 ---
+### MotionStreak组件介绍
+> MotionStreak(拖尾)是运动轨迹,用于在游戏对象的运动轨迹上实现拖尾渐隐效果。
 
+### 问题&解决方案
 在 Cocos Creator 3.x 中，如果你遇到了 MotionStreak（拖尾效果）预置体无法显示的问题，这个我认为是编译器的BUG,但目前可以使用以下方式进行修复
 查询了方案,说可以拖动到Canvas,然后使用右上角的按钮同步到预置体资源进行修复：
 
