@@ -69,6 +69,15 @@ include $(BUILD_SHARED_LIBRARY)
 ```mk
 APP_ABI := all
 ```
+此时应该可以执行`ndk-build`指令了,执行该命令会在`libs`目录下生成对应架构的`so`库文件了。
+![so库生成路径](images/2025/04/18/so库生成路径.png)
+这里需要特别注意下,`Android`中默认的`so`库加载路径是在`src/main/jniLibs`目录下,若将`so`库放置于其他目录下，需在`build.gradle`文件中配置`jniLibs`目录路径。
+```gradle
+main {
+   // 指定自定义 SO 库路径（若未使用默认 jniLibs 目录）
+   jniLibs.srcDirs = ['libs']
+}
+```
 
 
 
